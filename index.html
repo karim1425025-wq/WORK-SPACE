@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Workspace Ultimate | مساحة العمل</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --glass: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text: #1e293b;
+            --radius: 18px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode {
+            --glass: rgba(30, 41, 59, 0.96);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #f8fafc;
+            --primary: #818cf8;
+        }
+
+        * { box-sizing: border-box; transition: background 0.2s, color 0.2s; }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1920');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text);
+            overflow-x: hidden;
+            transition: background-image 0.2s ease-out;
+        }
+
+        /* Animations */
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Header */
+        header {
+            background: var(--glass);
+            padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            backdrop-filter: blur(12px); border-bottom: 1px solid var(--glass-border);
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .logo-text { font-weight: 800; font-size: 1.4rem; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .score-badge {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white; padding: 5px 15px; border-radius: 30px;
+            font-weight: bold; font-size: 1rem; display: flex; align-items: center; gap: 5px;
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-group { display: flex; gap: 8px; align-items: center; }
+        .nav-btn {
+            background: rgba(255,255,255,0.5); border: 1px solid var(--text);
+            color: var(--text); padding: 8px 14px; border-radius: 12px; 
+            cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;
+            font-family: inherit; font-size: 0.9rem; height: 38px;
+            transition: all 0.2s;
+        }
+        .nav-btn:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); }
+
+        /* Draggable Timer */
+        .focus-timer {
+            position: fixed; top: 120px; left: 30px;
+            width: 55px; height: auto;
+            background: var(--glass); border-radius: 18px;
+            box-shadow: var(--shadow); border: 1px solid var(--glass-border);
+            display: flex; flex-direction: column; align-items: center; padding: 10px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            overflow: hidden; z-index: 900; backdrop-filter: blur(10px);
+            animation: slideUp 0.5s ease-out 0.2s backwards;
+        }
+        .focus-timer:hover, .focus-timer.active { width: 220px; }
+        .drag-handle { cursor: grab; width: 100%; text-align: center; font-size: 1.4rem; color: var(--primary); margin-bottom: 5px; }
+        .focus-controls { display: none; flex-direction: column; gap: 8px; width: 100%; text-align: center; opacity: 0; transition: opacity 0.2s; }
+        .focus-timer:hover .focus-controls, .focus-timer.active .focus-controls { display: flex; opacity: 1; }
+        .timer-display { font-size: 1.6rem; font-weight: 800; margin: 5px 0; letter-spacing: 1px; }
+
+        .time-inputs { display: flex; gap: 5px; justify-content: center; align-items: center; width: 100%; }
+        .time-inputs input { width: 50px; text-align: center; padding: 5px; border-radius: 8px; }
+        .time-sep { font-weight: bold; font-size: 1.2rem; }
+
+        /* Container */
+        .container {
+            max-width: 1200px; margin: 2rem auto; padding: 0 20px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem;
+        }
+        .card {
+            background: var(--glass); border-radius: var(--radius); padding: 1.5rem;
+            box-shadow: var(--shadow); backdrop-filter: blur(10px); border: 1px solid var(--glass-border);
+            animation: slideUp 0.5s ease-out; transition: transform 0.2s;
+        }
+        .card:hover { transform: translateY(-3px); }
+        h2 { margin-top: 0; color: var(--primary); border-bottom: 2px solid rgba(0,0,0,0.05); padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* Inputs */
+        .input-row { display: flex; gap: 8px; margin-bottom: 20px; }
+        input, select {
+            padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e1; outline: none;
+            background: rgba(255,255,255,0.8); font-family: inherit; font-size: 0.95rem; flex: 1;
+            transition: all 0.2s;
+        }
+        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
+        body.dark-mode input, body.dark-mode select { background: rgba(0,0,0,0.2); border-color: #475569; color: white; }
+        
+        .add-btn {
+            background: var(--primary); color: white; border: none; padding: 0 18px;
+            border-radius: 12px; cursor: pointer; font-weight: bold; transition: all 0.2s;
+        }
+        .add-btn:active { transform: scale(0.95); }
+
+        /* Lists & Delete Button */
+        .list-container { max-height: 400px; overflow-y: auto; padding-right: 5px; }
+        .task-item, .link-item {
+            background: rgba(255,255,255,0.4); margin-bottom: 10px; padding: 8px 15px; /* Reduced padding slightly */
+            border-radius: 14px; display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid rgba(0,0,0,0.05); transition: 0.2s; animation: slideUp 0.3s ease-out forwards;
+        }
+        body.dark-mode .task-item { background: rgba(255,255,255,0.05); }
+        .task-item:hover, .link-item:hover { background: rgba(255,255,255,0.8); }
+
+        /* New Delete Button Style */
+        .btn-delete {
+            color: #ef4444; 
+            background: transparent;
+            border: none;
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.1);
+            transform: scale(1.1);
+        }
+
+        /* Chat Widget */
+        .chat-widget {
+            position: fixed; bottom: 25px; right: 25px; width: 380px; height: 500px;
+            background: var(--glass); border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            display: flex; flex-direction: column; overflow: hidden; z-index: 1000;
+            border: 1px solid var(--glass-border); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(20px); animation: slideUp 0.6s ease-out 0.4s backwards;
+        }
+        
+        .chat-widget.minimized { 
+            height: 60px; width: 60px; border-radius: 50%; cursor: pointer; 
+            bottom: 30px; right: 30px; background: var(--primary); padding: 0;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .chat-widget.minimized .chat-header { background: transparent; padding: 0; width: 100%; height: 100%; justify-content: center; }
+        .chat-widget.minimized .chat-header span, .chat-widget.minimized .chat-body, .chat-widget.minimized .chat-input { display: none !important; }
+        .chat-widget.minimized #chatIcon { display: block !important; transform: rotate(180deg); margin: 0; font-size: 1.5rem; color: #fff;}
+
+        .chat-header { 
+            background: var(--primary); color: white; padding: 15px 20px; cursor: pointer; 
+            display: flex; justify-content: space-between; align-items: center; font-weight: bold;
+        }
+        .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .msg { padding: 10px 14px; border-radius: 14px; max-width: 85%; font-size: 0.95rem; line-height: 1.5; }
+        .msg-ai { background: rgba(255,255,255,0.85); align-self: flex-start; border: 1px solid rgba(0,0,0,0.05); }
+        .msg-user { background: var(--primary); color: white; align-self: flex-end; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2); }
+        body.dark-mode .msg-ai { background: #334155; color: white; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        .modal-content { 
+            background: white; padding: 30px; border-radius: 24px; width: 90%; max-width: 450px; 
+            text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: slideUp 0.3s ease-out;
+        }
+        body.dark-mode .modal-content { background: #1e293b; color: white; }
+        
+        .modal-buttons { display: flex; gap: 15px; margin-top: 25px; }
+        .btn-modal { flex: 1; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; border: none; }
+        .btn-save { background: var(--primary); color: white; }
+        .btn-close { background: transparent; border: 2px solid #cbd5e1; color: inherit; }
+
+    </style>
+</head>
+<body>
+
+    <div class="focus-timer" id="focusWidget">
+        <div class="drag-handle" id="dragHeader"><i class="fas fa-clock"></i></div>
+        <div class="focus-controls">
+            <span class="lang-timer-title" style="font-size:0.85rem; opacity:0.8">مؤقت</span>
+            <div class="timer-display" id="focusDisplay">00:00:00</div>
+            
+            <div class="time-inputs">
+                <div style="display:flex; flex-direction:column;">
+                    <input type="number" id="focusHrs" placeholder="00" min="0">
+                    <span style="font-size:0.7rem">ساعة</span>
+                </div>
+                <span class="time-sep">:</span>
+                <div style="display:flex; flex-direction:column;">
+                    <input type="number" id="focusMins" placeholder="25" min="0">
+                    <span style="font-size:0.7rem">دقيقة</span>
+                </div>
+            </div>
+
+            <button class="add-btn lang-start" onclick="startFocusTimer()" style="width:100%; margin-top:5px;">ابدأ</button>
+            <button class="nav-btn lang-stop" onclick="stopFocusTimer()" style="width:100%; justify-content:center; color:#ef4444; border-color:#ef4444; background:transparent">إيقاف</button>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0"><i class="fas fa-key" style="color:var(--primary)"></i> Gemini API</h3>
+            <p class="lang-api-desc" style="opacity:0.8; margin-bottom:20px">أدخل مفتاح Google Gemini API لتفعيل الذكاء الكامل.</p>
+            <input type="password" id="apiKeyInput" placeholder="Paste API Key here..." style="width: 100%; padding:14px; text-align:center; border:2px solid #e2e8f0; font-family:monospace;">
+            <div class="modal-buttons">
+                <button onclick="document.getElementById('settingsModal').style.display='none'" class="btn-modal btn-close lang-cancel">إغلاق</button>
+                <button class="btn-modal btn-save lang-save" onclick="saveSettings()">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo-area">
+            <div class="logo-text"><i class="fas fa-brain"></i> <span id="appTitle">Workspace</span></div>
+            <div class="score-badge"><i class="fas fa-trophy"></i> <span id="scoreVal">0</span></div>
+        </div>
+        
+        <div class="btn-group">
+            <button class="nav-btn" onclick="toggleLanguage()"><i class="fas fa-globe"></i> <span class="lang-text">EN</span></button>
+            <button class="nav-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+            <button class="nav-btn" onclick="changeBg()"><i class="fas fa-image"></i> <span class="lang-bg-text">خلفية</span></button>
+            <button class="nav-btn" onclick="openSettings()"><i class="fas fa-cog"></i> API</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>
+                <span class="lang-tasks-title"><i class="fas fa-tasks"></i> المهام</span>
+                <span class="lang-clear" style="font-size:0.8rem; cursor:pointer; opacity:0.7" onclick="clearTasks()"><i class="fas fa-trash-alt"></i> مسح</span>
+            </h2>
+            <div class="input-row">
+                <input type="text" id="taskInput" class="lang-task-ph" placeholder="مهمة جديدة..." style="flex: 2;">
+                
+                <input type="number" id="taskDuration" placeholder="عدد" min="1" style="width: 70px;">
+                
+                <select id="taskUnit" style="width: 110px;">
+                    <option value="1" class="lang-hour">ساعة</option>
+                    <option value="24" class="lang-day">يوم</option>
+                    <option value="168" class="lang-week">أسبوع</option>
+                    <option value="720" class="lang-month">شهر</option>
+                </select>
+                
+                <button class="add-btn" onclick="addTask()"><i class="fas fa-plus"></i></button>
+            </div>
+            <div id="taskList" class="list-container"></div>
+        </div>
+
+        <div class="card">
+            <h2>
+                <span class="lang-links-title"><i class="fas fa-link"></i> الروابط</span>
+                <span class="lang-clear" style="font-size:0.8rem; cursor:pointer; opacity:0.7" onclick="clearLinks()"><i class="fas fa-trash-alt"></i> مسح</span>
+            </h2>
+            <div class="input-row">
+                <input type="text" id="linkName" class="lang-link-name-ph" placeholder="الاسم" style="flex: 1;">
+                <input type="text" id="linkUrl" placeholder="URL..." style="flex: 2;">
+                <button class="add-btn" onclick="addLink()"><i class="fas fa-save"></i></button>
+            </div>
+            <div id="linkList" class="list-container"></div>
+        </div>
+    </div>
+
+    <div class="chat-widget" id="chatWidget">
+        <div class="chat-header" onclick="toggleChatWidget()">
+            <span class="lang-ai-title"><i class="fas fa-robot"></i> المساعد</span>
+            <i class="fas fa-chevron-down" id="chatIcon"></i>
+        </div>
+        <div class="chat-body" id="chatBox">
+            <div class="msg msg-ai lang-welcome-msg">أهلاً! أنا هنا للمساعدة.</div>
+        </div>
+        <div class="chat-input" style="padding: 15px; background: var(--glass); border-top:1px solid var(--glass-border); display:flex; gap:10px;">
+            <input type="text" id="chatInput" class="lang-chat-ph" placeholder="اكتب..." style="flex:1" onkeypress="handleEnter(event)">
+            <button class="add-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        // --- Translations ---
+        const dictionary = {
+            ar: {
+                title: "مساحة العمل", tasks: "المهام", links: "الروابط", 
+                clear: "مسح الكل", taskPh: "مهمة جديدة...", linkNamePh: "اسم الموقع",
+                hour: "ساعة", day: "يوم", week: "أسبوع", month: "شهر",
+                aiTitle: "المساعد", chatPh: "أكتب أمرك...", 
+                timerTitle: "مؤقت", start: "ابدأ", stop: "إيقاف",
+                apiDesc: "أدخل مفتاح Google Gemini API لتفعيل الذكاء الكامل.",
+                save: "حفظ", cancel: "إغلاق", bgText: "خلفية",
+                welcome: "أهلاً! 👋<br>أنا جاهز لمساعدتك."
+            },
+            en: {
+                title: "Workspace", tasks: "Tasks", links: "Links", 
+                clear: "Clear All", taskPh: "New Task...", linkNamePh: "Site Name",
+                hour: "Hour", day: "Day", week: "Week", month: "Month",
+                aiTitle: "Assistant", chatPh: "Command...", 
+                timerTitle: "Timer", start: "Start", stop: "Stop",
+                apiDesc: "Enter Google Gemini API Key for full AI.",
+                save: "Save", cancel: "Close", bgText: "Bg",
+                welcome: "Hello! 👋<br>I'm ready to help you."
+            }
+        };
+
+        // --- State ---
+        let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+        let links = JSON.parse(localStorage.getItem('links') || '[]');
+        let score = parseInt(localStorage.getItem('score') || '0');
+        let apiKey = localStorage.getItem('gemini_key') || '';
+        let isDark = localStorage.getItem('isDark') === 'true';
+        let currentLang = localStorage.getItem('lang') || 'ar';
+        let focusInterval;
+
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', () => {
+            applyLanguage();
+            renderTasks();
+            renderLinks();
+            updateScoreUI();
+            if(isDark) document.body.classList.add('dark-mode');
+            
+            const savedTimerPos = JSON.parse(localStorage.getItem('timerPos'));
+            if(savedTimerPos) {
+                const w = document.getElementById('focusWidget');
+                w.style.top = savedTimerPos.top;
+                w.style.left = savedTimerPos.left;
+            }
+            setupDraggable();
+        });
+
+        // --- Background Logic ---
+        function changeBg() { 
+            const bgs = [
+                'https://images.unsplash.com/photo-1497366216548-37526070297c',
+                'https://images.unsplash.com/photo-1518770660439-4636190af475',
+                'https://images.unsplash.com/photo-1451187580459-43490279c0fa',
+                'https://images.unsplash.com/photo-1550751827-4bd374c3f58b',
+                'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
+                'https://images.unsplash.com/photo-1483729558449-99ef09a8c325',
+                'https://images.unsplash.com/photo-1534796636912-3b95b3ab5980'
+            ];
+            const randomImg = bgs[Math.floor(Math.random() * bgs.length)] + '?q=80&w=1920';
+            const img = new Image();
+            img.src = randomImg;
+            img.onload = () => { document.body.style.backgroundImage = `url('${randomImg}')`; };
+        }
+
+        // --- Language & UI ---
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            localStorage.setItem('lang', currentLang);
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            applyLanguage();
+            renderTasks(); // Re-render to update units
+        }
+
+        function applyLanguage() {
+            const t = dictionary[currentLang];
+            document.getElementById('appTitle').innerText = t.title;
+            document.querySelector('.lang-text').innerText = currentLang === 'ar' ? 'EN' : 'عربي';
+            document.querySelector('.lang-bg-text').innerText = t.bgText;
+            document.querySelector('.lang-tasks-title').innerHTML = `<i class="fas fa-tasks"></i> ${t.tasks}`;
+            document.querySelector('.lang-links-title').innerHTML = `<i class="fas fa-link"></i> ${t.links}`;
+            document.querySelectorAll('.lang-clear').forEach(el => el.innerHTML = `<i class="fas fa-trash-alt"></i> ${t.clear}`);
+            document.querySelector('.lang-ai-title').innerHTML = `<i class="fas fa-robot"></i> ${t.aiTitle}`;
+            document.querySelector('.lang-timer-title').innerText = t.timerTitle;
+            document.querySelector('.lang-start').innerText = t.start;
+            document.querySelector('.lang-stop').innerText = t.stop;
+            document.querySelector('.lang-api-desc').innerText = t.apiDesc;
+            document.querySelector('.lang-save').innerText = t.save;
+            document.querySelector('.lang-cancel').innerText = t.cancel;
+            document.querySelector('.lang-task-ph').placeholder = t.taskPh;
+            document.querySelector('.lang-link-name-ph').placeholder = t.linkNamePh;
+            document.querySelector('.lang-chat-ph').placeholder = t.chatPh;
+            document.querySelector('.lang-hour').innerText = t.hour;
+            document.querySelector('.lang-day').innerText = t.day;
+            document.querySelector('.lang-week').innerText = t.week;
+            document.querySelector('.lang-month').innerText = t.month;
+            
+            const chatBox = document.getElementById('chatBox');
+            // Update welcome message if it's the only message
+            if(chatBox.children.length <= 1) chatBox.innerHTML = `<div class="msg msg-ai">${t.welcome}</div>`;
+        }
+
+        // --- Core Functions ---
+        function addTask(textVal=null, durationVal=null) {
+            const input = document.getElementById('taskInput');
+            const text = textVal || input.value.trim();
+            if (!text) return;
+            
+            const unit = parseInt(document.getElementById('taskUnit').value);
+            const count = parseInt(document.getElementById('taskDuration').value) || 1;
+            const hoursToAdd = durationVal || (count * unit);
+            
+            const now = new Date();
+            tasks.push({ id: Date.now(), text: text, due: new Date(now.getTime() + (hoursToAdd * 3600000)).toISOString(), done: false });
+            saveData(); renderTasks(); input.value = ''; updateScore(5);
+        }
+
+        function renderTasks() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            tasks.sort((a,b) => new Date(a.due) - new Date(b.due)); 
+            tasks.forEach(t => {
+                const diff = new Date(t.due) - new Date();
+                const hoursLeft = Math.ceil(diff / 3600000);
+                
+                let timeString = "";
+                if (hoursLeft > 24) {
+                    timeString = Math.floor(hoursLeft/24) + (currentLang==='ar'?' يوم':' d');
+                } else {
+                    timeString = hoursLeft + (currentLang==='ar'?' ساعة':' h');
+                }
+
+                let badge = diff < 0 ? '<span style="color:red">!</span>' : `<span>${timeString}</span>`;
+                
+                list.innerHTML += `
+                    <div class="task-item">
+                        <div onclick="toggleTask(${t.id})" style="cursor:pointer; display:flex; align-items:center; gap:10px; flex:1">
+                            <i class="far ${t.done?'fa-check-circle':'fa-circle'}" style="color:${t.done?'green':'var(--primary)'}"></i>
+                            <div style="${t.done?'text-decoration:line-through;opacity:0.6':''}">${t.text}</div>
+                            <span style="font-size:0.7rem; background:#cbd5e1; padding:2px 6px; border-radius:4px">${badge}</span>
+                        </div>
+                        <button class="btn-delete" onclick="deleteTask(${t.id})"><i class="fas fa-trash"></i></button>
+                    </div>`;
+            });
+        }
+
+        function toggleTask(id) { const t=tasks.find(x=>x.id===id); t.done=!t.done; if(t.done) updateScore(10); saveData(); renderTasks(); }
+        function deleteTask(id) { tasks=tasks.filter(x=>x.id!==id); saveData(); renderTasks(); }
+        function clearTasks() { if(confirm("Confirm?")) { tasks=[]; saveData(); renderTasks(); } }
+
+        function addLink() {
+            const n = document.getElementById('linkName').value;
+            let u = document.getElementById('linkUrl').value;
+            if(!u) return; if(!u.startsWith('http')) u='https://'+u;
+            links.push({name:n||u, url:u}); saveData(); renderLinks();
+            document.getElementById('linkName').value=''; document.getElementById('linkUrl').value='';
+        }
+        function renderLinks() {
+            const d=document.getElementById('linkList'); d.innerHTML='';
+            links.forEach((l,i)=> d.innerHTML+=`
+            <div class="link-item">
+                <a href="${l.url}" target="_blank" style="text-decoration:none; color:var(--primary); font-weight:500;">
+                    <i class="fas fa-external-link-alt" style="font-size:0.8rem; margin-inline-end:5px"></i> ${l.name}
+                </a>
+                <button class="btn-delete" onclick="deleteLink(${i})"><i class="fas fa-trash"></i></button>
+            </div>`);
+        }
+        function deleteLink(i) { links.splice(i,1); saveData(); renderLinks(); }
+        function clearLinks() { links=[]; saveData(); renderLinks(); }
+
+        // --- Draggable Timer ---
+        function setupDraggable() {
+            const elm = document.getElementById("focusWidget");
+            const handle = document.getElementById("dragHeader");
+            let pos1=0, pos2=0, pos3=0, pos4=0;
+            handle.onmousedown = (e) => { e.preventDefault(); pos3=e.clientX; pos4=e.clientY; document.onmouseup = closeDrag; document.onmousemove = elementDrag; elm.classList.add('active'); };
+            function elementDrag(e) { e.preventDefault(); pos1=pos3-e.clientX; pos2=pos4-e.clientY; pos3=e.clientX; pos4=e.clientY; elm.style.top=(elm.offsetTop-pos2)+"px"; elm.style.left=(elm.offsetLeft-pos1)+"px"; }
+            function closeDrag() { document.onmouseup=null; document.onmousemove=null; elm.classList.remove('active'); localStorage.setItem('timerPos', JSON.stringify({top:elm.style.top, left:elm.style.left})); }
+        }
+        
+        function startFocusTimer() {
+            clearInterval(focusInterval);
+            const hrs = parseInt(document.getElementById('focusHrs').value) || 0;
+            const mins = parseInt(document.getElementById('focusMins').value) || 0;
+            let total = (hrs * 3600) + (mins * 60);
+            if (total <= 0) { total = 1500; } 
+
+            const disp = document.getElementById('focusDisplay');
+            document.getElementById('focusWidget').classList.add('active');
+            
+            focusInterval = setInterval(() => {
+                total--;
+                if(total<0) { 
+                    clearInterval(focusInterval); 
+                    disp.innerText="00:00:00"; 
+                    alert("Time's Up!"); 
+                    return; 
+                }
+                const h = Math.floor(total / 3600);
+                const m = Math.floor((total % 3600) / 60);
+                const s = total % 60;
+                disp.innerText = `${h<10?'0'+h:h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
+            }, 1000);
+        }
+        
+        function stopFocusTimer() { clearInterval(focusInterval); document.getElementById('focusDisplay').innerText="00:00:00"; }
+
+        // --- AI Logic ---
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+            addMsg(text, 'msg-user'); input.value='';
+            
+            const loadId = 'load-'+Date.now();
+            document.getElementById('chatBox').innerHTML += `<div class="msg msg-ai" id="${loadId}"><i class="fas fa-spinner fa-spin"></i></div>`;
+            scrollToBottom();
+            
+            if(!apiKey || apiKey.length < 10) { 
+                setTimeout(()=>{
+                    document.getElementById(loadId).remove(); 
+                    addMsg(currentLang==='ar'?"⚠️ من فضلك أضف مفتاح API من الإعدادات." : "⚠️ Please add valid API Key.", 'msg-ai');
+                    simulateAI(text); 
+                }, 500); 
+                return; 
+            }
+
+            try {
+                const langInstruction = currentLang === 'ar' ? "Reply in Arabic." : "Reply in English.";
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                
+                const res = await fetch(url, {
+                    method: 'POST', 
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ 
+                        contents: [{ parts: [{ text: `
+                            System: You are a workspace assistant. ${langInstruction}
+                            User: "${text}"
+                            Return JSON ONLY: {"action": "sort|clear_tasks|clear_links|dark|light|timer|add|chat", "text": "...", "minutes": 0, "reply": "..."}
+                        `}] }] 
+                    })
+                });
+                
+                if (!res.ok) throw new Error("API Error");
+
+                const data = await res.json();
+                document.getElementById(loadId).remove();
+                
+                let raw = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
+                const act = JSON.parse(raw);
+                
+                if(act.reply) addMsg(act.reply, 'msg-ai');
+                
+                if(act.action === 'sort') renderTasks();
+                if(act.action === 'clear_tasks') { tasks=[]; saveData(); renderTasks(); }
+                if(act.action === 'clear_links') { links=[]; saveData(); renderLinks(); }
+                if(act.action === 'dark' && !isDark) toggleDarkMode();
+                if(act.action === 'light' && isDark) toggleDarkMode();
+                if(act.action === 'timer') { document.getElementById('focusMins').value = act.minutes||20; startFocusTimer(); }
+                if(act.action === 'add') addTask(act.text, 24); 
+
+            } catch(e) {
+                console.error(e);
+                if(document.getElementById(loadId)) document.getElementById(loadId).remove();
+                simulateAI(text);
+            }
+        }
+
+        function simulateAI(txt) {
+            txt = txt.toLowerCase();
+            let r = currentLang === 'ar' ? "تم التنفيذ." : "Done.";
+            if(txt.includes("dark") || txt.includes("مظلم")) { toggleDarkMode(); }
+            else if(txt.includes("light") || txt.includes("فاتح")) { if(isDark) toggleDarkMode(); }
+            else if(txt.includes("sort") || txt.includes("رتب")) { renderTasks(); }
+            else if(txt.includes("clear") || txt.includes("مسح")) { if(txt.includes("link")) {links=[];saveData();renderLinks();} else {tasks=[];saveData();renderTasks();} }
+            else if(txt.includes("add") || txt.includes("ضيف")) { addTask(txt.replace("add","").replace("ضيف",""), 24); }
+            else { r = currentLang==='ar' ? "أمر غير معروف." : "Unknown command."; }
+            addMsg(r, 'msg-ai');
+        }
+
+        // --- Utils ---
+        function toggleDarkMode() { document.body.classList.toggle('dark-mode'); isDark=!isDark; localStorage.setItem('isDark', isDark); }
+        function updateScore(p) { score+=p; localStorage.setItem('score', score); updateScoreUI(); }
+        function updateScoreUI() { document.getElementById('scoreVal').innerText = score; }
+        function saveData() { localStorage.setItem('tasks', JSON.stringify(tasks)); localStorage.setItem('links', JSON.stringify(links)); }
+        function addMsg(t,c) { const b=document.getElementById('chatBox'); b.innerHTML+=`<div class="msg ${c}">${t}</div>`; scrollToBottom(); }
+        function scrollToBottom() { const b=document.getElementById('chatBox'); b.scrollTop=b.scrollHeight; }
+        function handleEnter(e) { if(e.key==='Enter') sendMessage(); }
+        function toggleChatWidget() { document.getElementById('chatWidget').classList.toggle('minimized'); }
+        function openSettings() { document.getElementById('settingsModal').style.display='flex'; }
+        function saveSettings() { 
+            apiKey=document.getElementById('apiKeyInput').value.trim(); 
+            localStorage.setItem('gemini_key', apiKey); 
+            document.getElementById('settingsModal').style.display='none'; 
+            alert("تم حفظ المفتاح! جرب الشات الآن.");
+        }
+
+    </script>
+</body>
+</html>
